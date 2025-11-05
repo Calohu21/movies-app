@@ -11,12 +11,12 @@ import { Movie } from '../../models/movie.interface';
 export class MovieList {
   movieService = inject(MovieService);
 
-  upComingMovies: WritableSignal<Movie[]> = signal([]);
+  discoverMovies: WritableSignal<Movie[]> = signal([]);
 
   onSearch() {
-    this.movieService.getUpComingMovies().subscribe((response) => {
-      this.upComingMovies.set(response);
-      console.log('MoviesListComponent: ', this.upComingMovies());
+    this.movieService.getDiscoverMovies().subscribe((response) => {
+      this.discoverMovies.set(response.results);
+      console.log('MoviesListComponent: ', this.discoverMovies());
     });
   }
 }

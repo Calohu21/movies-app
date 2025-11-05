@@ -1,20 +1,24 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
-import { Movie } from '../models/movie.interface';
+import { Observable, tap } from 'rxjs';
+import { MovieResponse } from '../models/movie.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MovieService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = environment.tmdbUrl;
+  private readonly apiKey = environment.tmdbApiKey;
 
-  getUpComingMovies(): Observable<Movie[]> {
-    return this.http.get<Movie[]>(`${environment.tmdbUrl}/movie/upcoming`, {
-      params: {
-        api_key: `${environment.tmdbApiKey}`,
-      },
-    });
+  getDiscoverMovies(): Observable<MovieResponse> {
+    return this.http
+      .get<MovieResponse>(`${this.apiUrl}/discover/movie`, {
+        params: {
+          api_key: this.apiKey,
+        },
+      })
+      .pipe(tap((resp) => console.log(resp)));
   }
 }

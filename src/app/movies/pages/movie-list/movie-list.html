@@ -1,2 +1,5 @@
-<p>movie-list works!</p>
+
 <button class="btn btn-info" (click)="onSearch()">Search</button>
+@for (movie of discoverMovies(); track movie.id) {
+  <span>{{movie.title}}</span>
+}
