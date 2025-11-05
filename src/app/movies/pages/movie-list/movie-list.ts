@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { MovieService } from '../../service/movie.service';
+import { Movie } from '../../models/movie.interface';
 
 @Component({
   selector: 'app-movie-list',
@@ -10,7 +11,7 @@ import { MovieService } from '../../service/movie.service';
 export class MovieList {
   movieService = inject(MovieService);
 
-  upComingMovies = signal({});
+  upComingMovies: WritableSignal<Movie[]> = signal([]);
 
   onSearch() {
     this.movieService.getUpComingMovies().subscribe((response) => {
