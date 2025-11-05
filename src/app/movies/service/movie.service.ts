@@ -1,0 +1,18 @@
+import { inject, Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class MovieService {
+  private http = inject(HttpClient);
+
+  getUpComingMovies() {
+    return this.http.get(`${environment.tmdbUrl}/movie/upcoming`, {
+      params: {
+        api_key: `${environment.tmdbApiKey}`,
+      },
+    });
+  }
+}
