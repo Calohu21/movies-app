@@ -1,6 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
 import { MovieService } from '../../service/movie.service';
-import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-movie-list',
