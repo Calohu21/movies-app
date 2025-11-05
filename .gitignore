@@ -45,5 +45,5 @@ Thumbs.db
 CLAUDE.md
 MOVIE_API.md
 .mcp.json
-environment*.ts
 environments/
+environment.ts
