@@ -31,7 +31,7 @@
           </td>
           <td><span class="badge badge-ghost badge-sm">{{movie.vote_average}}</span></td>
           <th>
-            <div class="badge badge-ghost badge-sm">{{movie.genre_ids}}</div>
+            <div class="badge badge-ghost badge-sm">{{movie.genre_ids | genreNames}}</div>
           </th>
           <td>
             <div class="badge badge-ghost badge-sm">{{movie.release_date}}</div>
