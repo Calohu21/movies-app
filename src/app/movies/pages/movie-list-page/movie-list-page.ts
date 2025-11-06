@@ -6,18 +6,18 @@ import { List } from '../../../shared/components/lis-component/list';
 @Component({
   selector: 'app-movie-list',
   imports: [List],
-  templateUrl: './movie-list.html',
+  templateUrl: './movie-list-page.html',
   styles: ``,
 })
-export class MovieList implements OnInit {
+export class MovieListPage implements OnInit {
   ngOnInit(): void {
-    this.onSearch();
+    this.getMovies();
   }
   movieService = inject(MovieService);
 
   discoverMovies: WritableSignal<Movie[]> = signal([]);
 
-  onSearch() {
+  getMovies() {
     this.movieService.getDiscoverMovies().subscribe((response) => {
       this.discoverMovies.set(response.results);
     });

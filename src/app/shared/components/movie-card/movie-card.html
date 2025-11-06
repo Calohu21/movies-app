@@ -1,0 +1,19 @@
+<div class="flex flex-wrap">
+@for (movie of movies(); track movie.id) {
+  <div class="card bg-base-100 w-70 shadow-sm">
+    <figure class="px-10 pt-10">
+      <img
+        src="{{movie.poster_path | tmdbImage}}"
+        alt="Shoes"
+        class="rounded-xl h-70" />
+    </figure>
+    <div class="card-body items-center text-center">
+      <h2 class="card-title">Card Title</h2>
+      <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
+      <div class="card-actions">
+        <button class="btn btn-primary">Buy Now</button>
+      </div>
+    </div>
+  </div>
+}
+</div>
