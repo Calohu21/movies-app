@@ -20,7 +20,6 @@ export class MovieList implements OnInit {
   onSearch() {
     this.movieService.getDiscoverMovies().subscribe((response) => {
       this.discoverMovies.set(response.results);
-      console.log('MoviesListComponent: ', this.discoverMovies());
     });
   }
 }
