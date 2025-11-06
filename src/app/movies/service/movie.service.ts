@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { MovieResponse } from '../models/movie.interface';
 
 @Injectable({
@@ -13,12 +13,10 @@ export class MovieService {
   private readonly apiKey = environment.tmdbApiKey;
 
   getDiscoverMovies(): Observable<MovieResponse> {
-    return this.http
-      .get<MovieResponse>(`${this.apiUrl}/discover/movie`, {
-        params: {
-          api_key: this.apiKey,
-        },
-      })
-      .pipe(tap((resp) => console.log(resp)));
+    return this.http.get<MovieResponse>(`${this.apiUrl}/discover/movie`, {
+      params: {
+        api_key: this.apiKey,
+      },
+    });
   }
 }
