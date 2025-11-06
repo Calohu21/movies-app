@@ -1,6 +1,5 @@
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MovieService } from '../../service/movie.service';
-import { Movie } from '../../models/movie.interface';
 import { List } from '../../../shared/components/lis-component/list';
 
 @Component({
@@ -10,16 +9,13 @@ import { List } from '../../../shared/components/lis-component/list';
   styles: ``,
 })
 export class MovieListPage implements OnInit {
+  private movieService = inject(MovieService);
+
   ngOnInit(): void {
-    this.getMovies();
+    if (this.movies().length === 0) {
+      console.log('MOVIES: ', this.movies());
+      this.movieService.getDiscoverMovies().subscribe();
+    }
   }
-  movieService = inject(MovieService);
-
-  discoverMovies: WritableSignal<Movie[]> = signal([]);
-
-  getMovies() {
-    this.movieService.getDiscoverMovies().subscribe((response) => {
-      this.discoverMovies.set(response.results);
-    });
-  }
+  movies = this.movieService.movies;
 }

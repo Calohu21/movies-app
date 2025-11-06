@@ -1,6 +1,5 @@
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MovieCard } from '../../../shared/components/movie-card/movie-card';
-import { Movie } from '../../models/movie.interface';
 import { MovieService } from '../../service/movie.service';
 
 @Component({
@@ -11,16 +10,11 @@ import { MovieService } from '../../service/movie.service';
 })
 export class MovieCardPage implements OnInit {
   ngOnInit(): void {
-    this.getMovies();
+    if (this.movies().length === 0) {
+      this.movieService.getDiscoverMovies().subscribe();
+    }
   }
   movieService = inject(MovieService);
 
-  Movies: WritableSignal<Movie[]> = signal([]);
-
-  getMovies() {
-    this.movieService.getDiscoverMovies().subscribe((response) => {
-      this.Movies.set(response.results);
-      console.log('MOVIES: ', this.Movies());
-    });
-  }
+  movies = this.movieService.movies;
 }
