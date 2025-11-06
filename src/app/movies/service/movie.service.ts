@@ -54,9 +54,6 @@ export class MovieService {
           api_key: this.apiKey,
         },
       })
-      .pipe(
-        tap((genres) => this.genresCache.set(genres)),
-        tap((genre) => console.log('GENRES', this.genresCache())),
-      );
+      .pipe(tap((genres) => this.genresCache.set(genres)));
   }
 }
