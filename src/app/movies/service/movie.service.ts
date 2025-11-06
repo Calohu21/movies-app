@@ -26,7 +26,6 @@ export class MovieService {
     if (this.moviesCache().length > 0) {
       return of(this.moviesCache());
     }
-    console.log('Después de la comprobación');
 
     return this.http
       .get<MovieResponse>(`${this.apiUrl}/discover/movie`, {
@@ -36,10 +35,8 @@ export class MovieService {
       })
       .pipe(
         tap((response) => {
-          console.log('RESPUESTA', response);
           this.movieRespCache.set(response);
           this.moviesCache.set(response.results);
-          console.log(this.movies());
         }),
         map((resp) => resp.results),
       );
@@ -57,6 +54,9 @@ export class MovieService {
           api_key: this.apiKey,
         },
       })
-      .pipe(tap((genres) => this.genresCache.set(genres)));
+      .pipe(
+        tap((genres) => this.genresCache.set(genres)),
+        tap((genre) => console.log('GENRES', this.genresCache())),
+      );
   }
 }

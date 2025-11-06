@@ -13,7 +13,6 @@ export class MovieListPage implements OnInit {
 
   ngOnInit(): void {
     if (this.movies().length === 0) {
-      console.log('MOVIES: ', this.movies());
       this.movieService.getDiscoverMovies().subscribe();
     }
   }
