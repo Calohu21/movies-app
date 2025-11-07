@@ -1,7 +1,8 @@
 
 <app-movie-card
   [movies]="movies()"
-
+  [hasMorePages]="hasMorePages()"
+  (loadMore)="onLoadMore()"
 >
 
 </app-movie-card>
