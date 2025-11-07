@@ -40,7 +40,7 @@ export class InfiniteScrollDirective {
 
             setTimeout(() => {
               this.isLoadingMore.set(false);
-            }, 1000);
+            }, 500);
           }
         });
     });

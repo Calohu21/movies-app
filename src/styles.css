@@ -2,3 +2,6 @@
 @plugin "daisyui" {
   themes: dracula --prefersdark;
 }
+body {
+  overflow: hidden;
+}

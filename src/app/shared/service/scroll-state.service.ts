@@ -6,7 +6,7 @@ import { ScrollEvent } from '../../movies/models/scroll-event.interface';
   providedIn: 'root',
 })
 export class ScrollStateService {
-  private readonly SCROLL_THRESHOLD = 300;
+  private readonly SCROLL_THRESHOLD = 600;
   private readonly scrollPositions = signal<Map<string, number>>(new Map());
 
   observeScroll(

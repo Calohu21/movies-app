@@ -19,7 +19,7 @@ export class MovieListPage implements OnInit {
     }
   }
 
-  onLoadMore() {
+  onLoadMore(): void {
     this.movieService.loadNextPage().subscribe();
   }
 }

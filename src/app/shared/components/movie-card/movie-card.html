@@ -2,7 +2,7 @@
   appInfiniteScroll
   [hasMorePages]="hasMorePages()"
   (loadMore)="loadMore.emit()"
-  class="flex flex-wrap mt-16"
+  class="flex flex-wrap h-screen overflow-y-auto mt-16"
 >
 @for (movie of movies(); track movie.id) {
   <div class="card bg-base-100 w-70 shadow-sm">
