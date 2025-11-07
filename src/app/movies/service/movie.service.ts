@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { map, Observable, of, tap } from 'rxjs';
@@ -16,30 +16,73 @@ export class MovieService {
   private readonly genresCache = signal<GenreResponse | null>(null);
   public readonly genres = this.genresCache.asReadonly();
 
-  private readonly movieRespCache = signal<MovieResponse | null>(null);
-  public readonly movieResp = this.movieRespCache.asReadonly();
+  private readonly moviesCacheByPage = signal<Map<number, Movie[]>>(new Map());
 
-  private readonly moviesCache = signal<Movie[]>([]);
-  public readonly movies = this.moviesCache.asReadonly();
+  private readonly currentPageCache = signal<number>(1);
+  public readonly currentPage = this.currentPageCache.asReadonly();
 
-  getDiscoverMovies(): Observable<Movie[]> {
-    if (this.moviesCache().length > 0) {
-      return of(this.moviesCache());
+  private readonly totalPagesCache = signal<number>(0);
+  public readonly totalPage = this.totalPagesCache.asReadonly();
+
+  public readonly hasMorePages = computed(() => {
+    return this.currentPageCache() < this.totalPagesCache();
+  });
+
+  public readonly allMovies = computed(() => {
+    const cache = this.moviesCacheByPage();
+    const movies: Movie[] = [];
+    const seenIds = new Set<number>();
+    const sortedPages = Array.from(cache.keys()).sort((a, b) => a - b);
+
+    for (const page of sortedPages) {
+      const pageMovies = cache.get(page) || [];
+
+      for (const movie of pageMovies) {
+        if (!seenIds.has(movie.id)) {
+          seenIds.add(movie.id);
+          movies.push(movie);
+        }
+      }
+    }
+    return movies;
+  });
+
+  getDiscoverMovies(page: number = 1): Observable<Movie[]> {
+    const cache = this.moviesCacheByPage();
+    if (cache.has(page)) {
+      return of(cache.get(page)!);
     }
 
     return this.http
       .get<MovieResponse>(`${this.apiUrl}/discover/movie`, {
         params: {
           api_key: this.apiKey,
+          page: page.toString(),
         },
       })
       .pipe(
-        tap((response) => {
-          this.movieRespCache.set(response);
-          this.moviesCache.set(response.results);
+        tap((resp) => {
+          const newCache = new Map(cache);
+          newCache.set(page, resp.results);
+          this.moviesCacheByPage.set(newCache);
+          this.totalPagesCache.set(resp.total_pages);
+
+          if (page > this.currentPageCache()) {
+            this.currentPageCache.set(page);
+          }
         }),
         map((resp) => resp.results),
       );
+  }
+
+  loadNextPAge(): Observable<Movie[]> {
+    const nextPage = this.currentPageCache();
+
+    if (this.totalPagesCache() > 0 && nextPage > this.totalPagesCache()) {
+      return of([]);
+    }
+
+    return this.getDiscoverMovies(nextPage);
   }
 
   getGenres() {
