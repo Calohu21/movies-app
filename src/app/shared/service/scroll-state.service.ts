@@ -59,4 +59,15 @@ export class ScrollStateService {
   clearAllScrollPositions(): void {
     this.scrollPositions.set(new Map());
   }
+
+  restoreScroll(elementRef: ElementRef<HTMLElement>, route: string): void {
+    const element = elementRef.nativeElement;
+    const savePosition = this.getScrollPosition(route);
+
+    setTimeout(() => {
+      if (element) {
+        element.scrollTop = savePosition;
+      }
+    }, 0);
+  }
 }
