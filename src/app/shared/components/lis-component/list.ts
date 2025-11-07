@@ -1,14 +1,17 @@
-import { Component, input, InputSignal } from '@angular/core';
+import { Component, input, InputSignal, output } from '@angular/core';
 import { Movie } from '../../../movies/models/movie.interface';
 import { TmbdImagePipe } from '../../pipes/tmbd.image.pipe';
 import { GenreNamesPipe } from '../../pipes/genre.names.pipe';
+import { InfiniteScrollDirective } from '../../directives/infinite-scroll.directive';
 
 @Component({
   selector: 'app-list',
-  imports: [TmbdImagePipe, GenreNamesPipe],
+  imports: [TmbdImagePipe, GenreNamesPipe, InfiniteScrollDirective],
   templateUrl: './list.html',
   styles: ``,
 })
 export class List {
-  discoverMovies: InputSignal<Movie[]> = input.required();
+  movies: InputSignal<Movie[]> = input.required();
+  hasMorePages = input(true);
+  loadMore = output();
 }

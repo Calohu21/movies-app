@@ -22,7 +22,7 @@ export class MovieService {
   public readonly currentPage = this.currentPageCache.asReadonly();
 
   private readonly totalPagesCache = signal<number>(0);
-  public readonly totalPage = this.totalPagesCache.asReadonly();
+  public readonly totalPages = this.totalPagesCache.asReadonly();
 
   public readonly hasMorePages = computed(() => {
     return this.currentPageCache() < this.totalPagesCache();
@@ -75,8 +75,8 @@ export class MovieService {
       );
   }
 
-  loadNextPAge(): Observable<Movie[]> {
-    const nextPage = this.currentPageCache();
+  loadNextPage(): Observable<Movie[]> {
+    const nextPage = this.currentPageCache() + 1;
 
     if (this.totalPagesCache() > 0 && nextPage > this.totalPagesCache()) {
       return of([]);
@@ -85,7 +85,7 @@ export class MovieService {
     return this.getDiscoverMovies(nextPage);
   }
 
-  getGenres() {
+  getGenres(): Observable<GenreResponse> {
     const cached = this.genresCache();
     if (cached !== null) {
       return of(cached);

@@ -10,11 +10,16 @@ import { List } from '../../../shared/components/lis-component/list';
 })
 export class MovieListPage implements OnInit {
   private movieService = inject(MovieService);
+  movies = this.movieService.allMovies;
+  hasMorePages = this.movieService.hasMorePages;
 
   ngOnInit(): void {
     if (this.movies().length === 0) {
       this.movieService.getDiscoverMovies().subscribe();
     }
   }
-  movies = this.movieService.movies;
+
+  onLoadMore() {
+    this.movieService.loadNextPage().subscribe();
+  }
 }
