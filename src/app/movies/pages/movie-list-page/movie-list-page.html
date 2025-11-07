@@ -1,2 +1,7 @@
 
-<app-list [discoverMovies]="movies()"></app-list>
+<app-list
+  [movies]="movies()"
+  [hasMorePages]="hasMorePages()"
+  (loadMore)="onLoadMore()"
+>
+</app-list>

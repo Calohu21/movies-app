@@ -9,12 +9,17 @@ import { MovieService } from '../../service/movie.service';
   styles: ``,
 })
 export class MovieCardPage implements OnInit {
+  private movieService = inject(MovieService);
+  movies = this.movieService.allMovies;
+  hasMorePages = this.movieService.hasMorePages;
+
   ngOnInit(): void {
     if (this.movies().length === 0) {
       this.movieService.getDiscoverMovies().subscribe();
     }
   }
-  movieService = inject(MovieService);
 
-  movies = this.movieService.movies;
+  onLoadMore() {
+    this.movieService.loadNextPage().subscribe();
+  }
 }

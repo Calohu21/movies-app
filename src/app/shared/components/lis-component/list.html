@@ -1,4 +1,9 @@
-<div class="overflow-x-auto mt-16">
+<div
+  appInfiniteScroll
+  [hasMorePages]="hasMorePages()"
+  (loadMore)="loadMore.emit()"
+  class="overflow-x-auto mt-16"
+>
   <table class="table">
     <thead>
     <tr>
@@ -11,7 +16,7 @@
     </tr>
     </thead>
     <tbody>
-      @for (movie of discoverMovies(); track movie.id) {
+      @for (movie of movies(); track movie.id) {
         <tr>
           <td>
             <div class="flex items-center gap-3">
