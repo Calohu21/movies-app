@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MovieService } from '../../service/movie.service';
-import { List } from '../../../shared/components/lis-component/list';
+import { List } from '../../../shared/components/list/list';
 
 @Component({
   selector: 'app-movie-list',
