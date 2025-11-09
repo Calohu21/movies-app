@@ -79,7 +79,7 @@ export class MovieService {
       );
   }
 
-  getMovieDetailById(movieId: number): Observable<DetailMovie> {
+  getMovieDetails(movieId: number): Observable<DetailMovie> {
     const cache = this.movieDetailCache();
     if (cache.has(movieId)) {
       return of(cache.get(movieId)!);
