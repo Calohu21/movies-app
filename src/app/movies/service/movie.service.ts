@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { map, Observable, of, tap } from 'rxjs';
 import { Movie, MovieResponse } from '../models/movie.interface';
 import { GenreResponse } from '../models/genre.interface';
+import { DetailMovie } from '../models/detail-movie.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,9 @@ export class MovieService {
 
   private readonly totalPagesCache = signal<number>(0);
   public readonly totalPages = this.totalPagesCache.asReadonly();
+
+  private readonly movieDetailCache = signal<Map<number, DetailMovie>>(new Map());
+  public readonly movieDetail = this.movieDetailCache.asReadonly();
 
   public readonly hasMorePages = computed(() => {
     return this.currentPageCache() < this.totalPagesCache();
@@ -72,6 +76,27 @@ export class MovieService {
           }
         }),
         map((resp) => resp.results),
+      );
+  }
+
+  getMovieDetailById(movieId: number): Observable<DetailMovie> {
+    const cache = this.movieDetailCache();
+    if (cache.has(movieId)) {
+      return of(cache.get(movieId)!);
+    }
+
+    return this.http
+      .get<DetailMovie>(`${this.apiUrl}/movie/${movieId}`, {
+        params: {
+          api_key: this.apiKey,
+        },
+      })
+      .pipe(
+        tap((movieDetail) => {
+          const newCache = new Map(cache);
+          newCache.set(movieId, movieDetail);
+          this.movieDetailCache.set(newCache);
+        }),
       );
   }
 
