@@ -20,7 +20,21 @@
     </button>
   </div>
   <div class="flex gap-2">
-    <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
+    <div class="relative">
+      <input
+        type="text"
+        placeholder="Buscar películas..."
+        [formControl]="searchControl"
+        class="input input-bordered w-24 md:w-auto pr-10" />
+      @if (movieService.isSearchActive()) {
+        <button
+          (click)="clearSearch()"
+          class="btn btn-ghost btn-xs btn-circle absolute right-2 top-1/2 -translate-y-1/2"
+          aria-label="Limpiar búsqueda">
+          ✕
+        </button>
+      }
+    </div>
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
