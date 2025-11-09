@@ -10,16 +10,21 @@ import { MovieService } from '../../service/movie.service';
 })
 export class MovieCardPage implements OnInit {
   private movieService = inject(MovieService);
-  movies = this.movieService.allMovies;
+  movies = this.movieService.displayMovies;
   hasMorePages = this.movieService.hasMorePages;
+  isSearchActive = this.movieService.isSearchActive;
 
   ngOnInit(): void {
-    if (this.movies().length === 0) {
+    if (this.movies().length === 0 && !this.isSearchActive()) {
       this.movieService.getDiscoverMovies().subscribe();
     }
   }
 
   onLoadMore(): void {
-    this.movieService.loadNextPage().subscribe();
+    if (this.isSearchActive()) {
+      this.movieService.loadNextSearchPage().subscribe();
+    } else {
+      this.movieService.loadNextPage().subscribe();
+    }
   }
 }

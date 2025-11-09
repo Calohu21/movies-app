@@ -28,7 +28,21 @@ export class MovieService {
   private readonly movieDetailCache = signal<Map<number, DetailMovie>>(new Map());
   public readonly movieDetail = this.movieDetailCache.asReadonly();
 
+  private readonly searchQueryCache = signal<string>('');
+  public readonly searchQuery = this.searchQueryCache.asReadonly();
+
+  private readonly searchResultsByPage = signal<Map<number, Movie[]>>(new Map());
+
+  private readonly searchCurrentPageCache = signal<number>(1);
+  private readonly searchTotalPagesCache = signal<number>(0);
+
+  private readonly isSearchModeCache = signal<boolean>(false);
+  public readonly isSearchActive = this.isSearchModeCache.asReadonly();
+
   public readonly hasMorePages = computed(() => {
+    if (this.isSearchModeCache()) {
+      return this.searchCurrentPageCache() < this.searchTotalPagesCache();
+    }
     return this.currentPageCache() < this.totalPagesCache();
   });
 
@@ -49,6 +63,32 @@ export class MovieService {
       }
     }
     return movies;
+  });
+
+  private readonly allSearchResults = computed(() => {
+    const cache = this.searchResultsByPage();
+    const movies: Movie[] = [];
+    const seenIds = new Set<number>();
+    const sortedPages = Array.from(cache.keys()).sort((a, b) => a - b);
+
+    for (const page of sortedPages) {
+      const pageMovies = cache.get(page) || [];
+
+      for (const movie of pageMovies) {
+        if (!seenIds.has(movie.id)) {
+          seenIds.add(movie.id);
+          movies.push(movie);
+        }
+      }
+    }
+    return movies;
+  });
+
+  public readonly displayMovies = computed(() => {
+    if (this.isSearchModeCache()) {
+      return this.allSearchResults();
+    }
+    return this.allMovies();
   });
 
   getDiscoverMovies(page: number = 1): Observable<Movie[]> {
@@ -123,5 +163,61 @@ export class MovieService {
         },
       })
       .pipe(tap((genres) => this.genresCache.set(genres)));
+  }
+
+  searchMovies(query: string, page: number = 1): Observable<Movie[]> {
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery) {
+      this.clearSearch();
+      return of([]);
+    }
+
+    return this.http
+      .get<MovieResponse>(`${this.apiUrl}/search/movie`, {
+        params: {
+          api_key: this.apiKey,
+          query: trimmedQuery,
+          page: page.toString(),
+        },
+      })
+      .pipe(
+        tap((resp) => {
+          // Update search query and mode
+          this.searchQueryCache.set(trimmedQuery);
+          this.isSearchModeCache.set(true);
+
+          // Update search results cache
+          const newCache = new Map(this.searchResultsByPage());
+          newCache.set(page, resp.results);
+          this.searchResultsByPage.set(newCache);
+
+          // Update pagination
+          this.searchTotalPagesCache.set(resp.total_pages);
+          if (page > this.searchCurrentPageCache()) {
+            this.searchCurrentPageCache.set(page);
+          }
+        }),
+        map((resp) => resp.results),
+      );
+  }
+
+  loadNextSearchPage(): Observable<Movie[]> {
+    const nextPage = this.searchCurrentPageCache() + 1;
+
+    if (this.searchTotalPagesCache() > 0 && nextPage > this.searchTotalPagesCache()) {
+      return of([]);
+    }
+
+    const query = this.searchQueryCache();
+    return this.searchMovies(query, nextPage);
+  }
+
+  clearSearch(): void {
+    this.searchQueryCache.set('');
+    this.searchResultsByPage.set(new Map());
+    this.searchCurrentPageCache.set(1);
+    this.searchTotalPagesCache.set(0);
+    this.isSearchModeCache.set(false);
   }
 }
