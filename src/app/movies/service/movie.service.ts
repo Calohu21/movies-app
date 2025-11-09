@@ -39,6 +39,9 @@ export class MovieService {
   private readonly isSearchModeCache = signal<boolean>(false);
   public readonly isSearchActive = this.isSearchModeCache.asReadonly();
 
+  private readonly genreFilterCache = signal<number | null>(null);
+  public readonly genreFilter = this.genreFilterCache.asReadonly();
+
   public readonly hasMorePages = computed(() => {
     if (this.isSearchModeCache()) {
       return this.searchCurrentPageCache() < this.searchTotalPagesCache();
@@ -97,12 +100,19 @@ export class MovieService {
       return of(cache.get(page)!);
     }
 
+    const params: Record<string, string> = {
+      api_key: this.apiKey,
+      page: page.toString(),
+    };
+
+    const genreId = this.genreFilterCache();
+    if (genreId !== null) {
+      params['with_genres'] = genreId.toString();
+    }
+
     return this.http
       .get<MovieResponse>(`${this.apiUrl}/discover/movie`, {
-        params: {
-          api_key: this.apiKey,
-          page: page.toString(),
-        },
+        params,
       })
       .pipe(
         tap((resp) => {
@@ -173,26 +183,30 @@ export class MovieService {
       return of([]);
     }
 
+    const params: Record<string, string> = {
+      api_key: this.apiKey,
+      query: trimmedQuery,
+      page: page.toString(),
+    };
+
+    const genreId = this.genreFilterCache();
+    if (genreId !== null) {
+      params['with_genres'] = genreId.toString();
+    }
+
     return this.http
       .get<MovieResponse>(`${this.apiUrl}/search/movie`, {
-        params: {
-          api_key: this.apiKey,
-          query: trimmedQuery,
-          page: page.toString(),
-        },
+        params,
       })
       .pipe(
         tap((resp) => {
-          // Update search query and mode
           this.searchQueryCache.set(trimmedQuery);
           this.isSearchModeCache.set(true);
 
-          // Update search results cache
           const newCache = new Map(this.searchResultsByPage());
           newCache.set(page, resp.results);
           this.searchResultsByPage.set(newCache);
 
-          // Update pagination
           this.searchTotalPagesCache.set(resp.total_pages);
           if (page > this.searchCurrentPageCache()) {
             this.searchCurrentPageCache.set(page);
@@ -219,5 +233,23 @@ export class MovieService {
     this.searchCurrentPageCache.set(1);
     this.searchTotalPagesCache.set(0);
     this.isSearchModeCache.set(false);
+  }
+
+  setGenreFilter(genreId: number | null): void {
+    this.genreFilterCache.set(genreId);
+
+    this.moviesCacheByPage.set(new Map());
+    this.currentPageCache.set(1);
+    this.totalPagesCache.set(0);
+
+    this.searchResultsByPage.set(new Map());
+    this.searchCurrentPageCache.set(1);
+    this.searchTotalPagesCache.set(0);
+
+    if (this.isSearchModeCache() && this.searchQueryCache()) {
+      this.searchMovies(this.searchQueryCache()).subscribe();
+    } else if (!this.isSearchModeCache()) {
+      this.getDiscoverMovies().subscribe();
+    }
   }
 }

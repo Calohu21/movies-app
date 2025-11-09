@@ -12,7 +12,9 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   movieService = inject(MovieService);
-  searchControl = new FormControl('');
+  searchControl = new FormControl<string>('');
+  genreControl = new FormControl<string>('');
+  genres = this.movieService.genres;
   private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
@@ -25,6 +27,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.movieService.clearSearch();
         }
       });
+
+    this.genreControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+      const genreId = value && value !== '' ? parseInt(value, 10) : null;
+      this.movieService.setGenreFilter(genreId);
+    });
   }
 
   clearSearch(): void {

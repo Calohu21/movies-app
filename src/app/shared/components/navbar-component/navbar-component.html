@@ -19,6 +19,14 @@
     >Ver por Cards
     </button>
   </div>
+  <div class="flex-none mx-3">
+    <select class="select select-bordered select-sm w-full max-w-xs" [formControl]="genreControl">
+      <option value="">Todos los géneros</option>
+      @for (genre of genres()?.genres; track genre.id) {
+        <option [value]="genre.id">{{ genre.name }}</option>
+      }
+    </select>
+  </div>
   <div class="flex gap-2">
     <div class="relative">
       <input
