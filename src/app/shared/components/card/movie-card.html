@@ -13,10 +13,13 @@
         class="rounded-xl h-70" />
     </figure>
     <div class="card-body items-center text-center">
-      <h2 class="card-title">Card Title</h2>
-      <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
+      <h2 class="card-title">{{movie.title}}</h2>
       <div class="card-actions">
-        <button class="btn btn-primary">Buy Now</button>
+        <button
+          class="btn btn-primary"
+          routerLink="/movie-detail/{{movie.id}}"
+        >
+          Detalles</button>
       </div>
     </div>
   </div>

@@ -1,1 +1,125 @@
-<p>card-detail works!</p>
+@if (isLoading()) {
+  <div class="flex justify-center items-center min-h-screen">
+    <span class="loading loading-spinner loading-lg"></span>
+  </div>
+}
+
+@if (hasError()) {
+  <div class="alert alert-error mt-32 ml-10 mr-10 w-200 justify-items-center">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6 shrink-0 stroke-current"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <span>Error al cargar los detalles de la película. Por favor, intenta nuevamente.</span>
+  </div>
+}
+
+@if (movie(); as movieData) {
+  <div class="card lg:card-side bg-base-100 shadow-xl mt-32 ml-10 mr-10">
+    <figure class="lg:w-3/12">
+      <img
+        [src]="movieData.poster_path | tmdbImage: 'w500'"
+        [alt]="movieData.title"
+        class="w-full h-full object-cover"
+      />
+    </figure>
+    <div class="card-body lg:w-2/3">
+      <h2 class="card-title text-3xl">{{ movieData.title }}</h2>
+
+      @if (movieData.tagline) {
+        <p class="italic text-gray-500">{{ movieData.tagline }}</p>
+      }
+
+      <div class="flex gap-2 flex-wrap my-2">
+        @for (genre of movieData.genres; track genre.id) {
+          <span class="badge badge-primary">{{ genre.name }}</span>
+        }
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 my-4">
+        <div>
+          <span class="font-bold">Fecha de estreno:</span>
+          <span class="ml-2">{{ movieData.release_date }}</span>
+        </div>
+        <div>
+          <span class="font-bold">Duración:</span>
+          <span class="ml-2">{{ movieData.runtime }} min</span>
+        </div>
+        <div>
+          <span class="font-bold">Calificación:</span>
+          <span class="ml-2">⭐ {{ movieData.vote_average }}/10</span>
+        </div>
+        <div>
+          <span class="font-bold">Votos:</span>
+          <span class="ml-2">{{ movieData.vote_count }}</span>
+        </div>
+      </div>
+
+      <div class="my-4">
+        <h3 class="font-bold text-xl mb-2">Sinopsis</h3>
+        <p>{{ movieData.overview }}</p>
+      </div>
+
+      @if (movieData.production_companies.length > 0) {
+        <div class="my-4">
+          <h3 class="font-bold text-xl mb-2">Productoras</h3>
+          <div class="flex gap-4 flex-wrap">
+            @for (company of movieData.production_companies; track company.id) {
+              <span class="badge badge-outline">{{ company.name }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="card-actions justify-end mt-4">
+        @if (movieData.homepage) {
+          <a
+            [href]="movieData.homepage"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-primary"
+          >
+            Sitio oficial
+          </a>
+        }
+        @if (movieData.imdb_id) {
+          <a
+            [href]="'https://www.imdb.com/title/' + movieData.imdb_id"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-secondary"
+          >
+            Ver en IMDB
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  <!-- Estado sin película -->
+  <div class="alert alert-warning mt-32 ml-10 mr-10 w-200 justify-items-center">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6 shrink-0 stroke-current"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+      />
+    </svg>
+    <span>No se encontró la película solicitada.</span>
+  </div>
+}
