@@ -8,7 +8,32 @@ import { TmbdImagePipe } from '../../pipes/tmbd.image.pipe';
   selector: 'app-movie-carousel',
   imports: [TmbdImagePipe],
   templateUrl: './movie-carousel.html',
-  styles: ``,
+  styles: `
+    :host {
+      display: block;
+    }
+
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+      background: oklch(var(--bc) / 0.2);
+      border-radius: 4px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+      background: oklch(var(--bc) / 0.3);
+    }
+  `,
 })
 export class MovieCarousel {
   config = input.required<CarouselConfig>();
