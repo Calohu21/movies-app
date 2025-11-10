@@ -47,6 +47,15 @@ export class MovieService {
   private readonly trendingDayCache = signal<Map<number, Movie[]>>(new Map());
   private readonly trendingWeekCache = signal<Map<number, Movie[]>>(new Map());
 
+  private readonly popularCurrentPageCache = signal<number>(1);
+  private readonly popularTotalPagesCache = signal<number>(0);
+  private readonly topRatedCurrentPageCache = signal<number>(1);
+  private readonly topRatedTotalPagesCache = signal<number>(0);
+  private readonly trendingDayCurrentPageCache = signal<number>(1);
+  private readonly trendingDayTotalPagesCache = signal<number>(0);
+  private readonly trendingWeekCurrentPageCache = signal<number>(1);
+  private readonly trendingWeekTotalPagesCache = signal<number>(0);
+
   public readonly hasMorePages = computed(() => {
     if (this.isSearchModeCache()) {
       return this.searchCurrentPageCache() < this.searchTotalPagesCache();
@@ -251,6 +260,10 @@ export class MovieService {
           const newCache = new Map(cache);
           newCache.set(page, resp.results);
           this.popularMoviesCache.set(newCache);
+          this.popularTotalPagesCache.set(resp.total_pages);
+          if (page > this.popularCurrentPageCache()) {
+            this.popularCurrentPageCache.set(page);
+          }
         }),
         map((resp) => resp.results),
       );
@@ -274,6 +287,10 @@ export class MovieService {
           const newCache = new Map(cache);
           newCache.set(page, resp.results);
           this.topRatedMoviesCache.set(newCache);
+          this.topRatedTotalPagesCache.set(resp.total_pages);
+          if (page > this.topRatedCurrentPageCache()) {
+            this.topRatedCurrentPageCache.set(page);
+          }
         }),
         map((resp) => resp.results),
       );
@@ -299,8 +316,16 @@ export class MovieService {
 
           if (timeWindow === 'day') {
             this.trendingDayCache.set(newCache);
+            this.trendingDayTotalPagesCache.set(resp.total_pages);
+            if (page > this.trendingDayCurrentPageCache()) {
+              this.trendingDayCurrentPageCache.set(page);
+            }
           } else {
             this.trendingWeekCache.set(newCache);
+            this.trendingWeekTotalPagesCache.set(resp.total_pages);
+            if (page > this.trendingWeekCurrentPageCache()) {
+              this.trendingWeekCurrentPageCache.set(page);
+            }
           }
         }),
         map((resp) => resp.results),
@@ -351,4 +376,116 @@ export class MovieService {
       this.getDiscoverMovies().subscribe();
     }
   }
+
+  loadNextPopularPage(): Observable<Movie[]> {
+    const nextPage = this.popularCurrentPageCache() + 1;
+
+    if (this.popularTotalPagesCache() > 0 && nextPage > this.popularTotalPagesCache()) {
+      return of([]);
+    }
+
+    return this.getPopularMovies(nextPage);
+  }
+
+  loadNextTopRatedPage(): Observable<Movie[]> {
+    const nextPage = this.topRatedCurrentPageCache() + 1;
+
+    if (this.topRatedTotalPagesCache() > 0 && nextPage > this.topRatedTotalPagesCache()) {
+      return of([]);
+    }
+
+    return this.getTopRatedMovies(nextPage);
+  }
+
+  loadNextTrendingDayPage(): Observable<Movie[]> {
+    const nextPage = this.trendingDayCurrentPageCache() + 1;
+
+    if (this.trendingDayTotalPagesCache() > 0 && nextPage > this.trendingDayTotalPagesCache()) {
+      return of([]);
+    }
+
+    return this.getTrendingDay(nextPage);
+  }
+
+  loadNextTrendingWeekPage(): Observable<Movie[]> {
+    const nextPage = this.trendingWeekCurrentPageCache() + 1;
+
+    if (this.trendingWeekTotalPagesCache() > 0 && nextPage > this.trendingWeekTotalPagesCache()) {
+      return of([]);
+    }
+
+    return this.getTrendingWeek(nextPage);
+  }
+
+  public readonly allPopularMovies = computed(() => {
+    const cache = this.popularMoviesCache();
+    const movies: Movie[] = [];
+    const seenIds = new Set<number>();
+    const sortedPages = Array.from(cache.keys()).sort((a, b) => a - b);
+
+    for (const page of sortedPages) {
+      const pageMovies = cache.get(page) || [];
+      for (const movie of pageMovies) {
+        if (!seenIds.has(movie.id)) {
+          seenIds.add(movie.id);
+          movies.push(movie);
+        }
+      }
+    }
+    return movies;
+  });
+
+  public readonly allTopRatedMovies = computed(() => {
+    const cache = this.topRatedMoviesCache();
+    const movies: Movie[] = [];
+    const seenIds = new Set<number>();
+    const sortedPages = Array.from(cache.keys()).sort((a, b) => a - b);
+
+    for (const page of sortedPages) {
+      const pageMovies = cache.get(page) || [];
+      for (const movie of pageMovies) {
+        if (!seenIds.has(movie.id)) {
+          seenIds.add(movie.id);
+          movies.push(movie);
+        }
+      }
+    }
+    return movies;
+  });
+
+  public readonly allTrendingDayMovies = computed(() => {
+    const cache = this.trendingDayCache();
+    const movies: Movie[] = [];
+    const seenIds = new Set<number>();
+    const sortedPages = Array.from(cache.keys()).sort((a, b) => a - b);
+
+    for (const page of sortedPages) {
+      const pageMovies = cache.get(page) || [];
+      for (const movie of pageMovies) {
+        if (!seenIds.has(movie.id)) {
+          seenIds.add(movie.id);
+          movies.push(movie);
+        }
+      }
+    }
+    return movies;
+  });
+
+  public readonly allTrendingWeekMovies = computed(() => {
+    const cache = this.trendingWeekCache();
+    const movies: Movie[] = [];
+    const seenIds = new Set<number>();
+    const sortedPages = Array.from(cache.keys()).sort((a, b) => a - b);
+
+    for (const page of sortedPages) {
+      const pageMovies = cache.get(page) || [];
+      for (const movie of pageMovies) {
+        if (!seenIds.has(movie.id)) {
+          seenIds.add(movie.id);
+          movies.push(movie);
+        }
+      }
+    }
+    return movies;
+  });
 }
