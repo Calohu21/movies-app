@@ -2,26 +2,18 @@
   appInfiniteScroll
   [hasMorePages]="hasMorePages()"
   (loadMore)="loadMore.emit()"
-  class="flex flex-wrap h-screen overflow-y-auto mt-16"
+  class="flex flex-wrap gap-4 p-4 justify-center"
 >
 @for (movie of movies(); track movie.id) {
-  <div class="card bg-base-100 w-70 shadow-sm">
-    <figure class="px-10 pt-10">
-      <img
-        src="{{movie.poster_path | tmdbImage}}"
-        alt="Shoes"
-        class="rounded-xl h-70" />
-    </figure>
-    <div class="card-body items-center text-center">
-      <h2 class="card-title">{{movie.title}}</h2>
-      <div class="card-actions">
-        <button
-          class="btn btn-primary"
-          routerLink="/movie-detail/{{movie.id}}"
-        >
-          Detalles</button>
-      </div>
-    </div>
+  <div
+    class="cursor-pointer transition-transform duration-300 hover:-translate-y-2"
+    routerLink="/movie-detail/{{movie.id}}"
+  >
+    <img
+      [src]="movie.poster_path | tmdbImage"
+      [alt]="movie.title"
+      class="rounded-lg w-44 h-64 object-cover shadow-lg hover:shadow-2xl transition-shadow duration-300"
+    />
   </div>
 }
 </div>

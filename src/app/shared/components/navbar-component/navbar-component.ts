@@ -1,8 +1,8 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { MovieService } from '../../../movies/service/movie.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-navbar-component',
@@ -12,12 +12,27 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   movieService = inject(MovieService);
+  private router = inject(Router);
   searchControl = new FormControl<string>('');
   genreControl = new FormControl<string>('');
   genres = this.movieService.genres;
   private destroy$ = new Subject<void>();
 
+  currentRoute = signal<string>('');
+
+  showGenreFilter = computed(() => this.currentRoute().startsWith('/movies'));
+
   ngOnInit(): void {
+    this.currentRoute.set(this.router.url);
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((event) => {
+        this.currentRoute.set((event as NavigationEnd).url);
+      });
+
     this.searchControl.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((query) => {
@@ -29,8 +44,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
       });
 
     this.genreControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
-      const genreId = value && value !== '' ? parseInt(value, 10) : null;
-      this.movieService.setGenreFilter(genreId);
+      if (value && value !== '') {
+        this.router.navigate(['/movies'], { queryParams: { genre: value } });
+      } else {
+        this.router.navigate(['/movies']);
+      }
     });
   }
 

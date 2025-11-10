@@ -31,18 +31,28 @@ export class InfiniteScrollDirective {
 
       this.scrollStateService.restoreScroll(element, currentRoute);
 
-      this.scrollStateService
-        .observeScroll(element, currentRoute, this.destroyRef)
-        .subscribe((event) => {
-          if (event.isNearBottom && !this.isLoadingMore() && this.hasMorePages()) {
-            this.isLoadingMore.set(true);
-            this.loadMore.emit();
+      this.destroyRef.onDestroy(() => {
+        window.removeEventListener('scroll', this.handleScroll);
+      });
 
-            setTimeout(() => {
-              this.isLoadingMore.set(false);
-            }, 500);
-          }
-        });
+      window.addEventListener('scroll', this.handleScroll);
     });
   }
+
+  private handleScroll = () => {
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const clientHeight = window.innerHeight;
+
+    const isNearBottom = scrollTop + clientHeight >= scrollHeight - 200;
+
+    if (isNearBottom && !this.isLoadingMore() && this.hasMorePages()) {
+      this.isLoadingMore.set(true);
+      this.loadMore.emit();
+
+      setTimeout(() => {
+        this.isLoadingMore.set(false);
+      }, 200);
+    }
+  };
 }
