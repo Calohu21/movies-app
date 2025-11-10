@@ -6,7 +6,7 @@ import { forkJoin } from 'rxjs';
 import { CarouselConfig } from '../../models/carousel.interface';
 
 @Component({
-  selector: 'app-movie-home',
+  selector: 'app-movie-home-page',
   imports: [MovieCarousel],
   templateUrl: './movie-home-page.html',
   styles: ``,
