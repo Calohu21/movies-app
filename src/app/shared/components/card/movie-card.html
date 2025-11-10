@@ -2,7 +2,7 @@
   appInfiniteScroll
   [hasMorePages]="hasMorePages()"
   (loadMore)="loadMore.emit()"
-  class="flex flex-wrap gap-4 p-4 justify-center overflow-y-auto"
+  class="flex flex-wrap gap-4 p-4 justify-center"
 >
 @for (movie of movies(); track movie.id) {
   <div
