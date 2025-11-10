@@ -17,6 +17,9 @@ export class MovieService {
   private readonly genresCache = signal<GenreResponse | null>(null);
   public readonly genres = this.genresCache.asReadonly();
 
+  private readonly genreFilterCache = signal<number | null>(null);
+  public readonly genreFilter = this.genreFilterCache.asReadonly();
+
   private readonly moviesCacheByPage = signal<Map<number, Movie[]>>(new Map());
 
   private readonly currentPageCache = signal<number>(1);
@@ -39,8 +42,10 @@ export class MovieService {
   private readonly isSearchModeCache = signal<boolean>(false);
   public readonly isSearchActive = this.isSearchModeCache.asReadonly();
 
-  private readonly genreFilterCache = signal<number | null>(null);
-  public readonly genreFilter = this.genreFilterCache.asReadonly();
+  private readonly popularMoviesCache = signal<Map<number, Movie[]>>(new Map());
+  private readonly topRatedMoviesCache = signal<Map<number, Movie[]>>(new Map());
+  private readonly trendingDayCache = signal<Map<number, Movie[]>>(new Map());
+  private readonly trendingWeekCache = signal<Map<number, Movie[]>>(new Map());
 
   public readonly hasMorePages = computed(() => {
     if (this.isSearchModeCache()) {
@@ -214,6 +219,100 @@ export class MovieService {
         }),
         map((resp) => resp.results),
       );
+  }
+
+  getMoviesByGenre(genreId: number, page: number): Observable<Movie[]> {
+    return this.http
+      .get<MovieResponse>(`${this.apiUrl}/discover/movie`, {
+        params: {
+          api_key: this.apiKey,
+          page: page.toString(),
+          with_genres: genreId.toString(),
+        },
+      })
+      .pipe(map((resp) => resp.results));
+  }
+
+  getPopularMovies(page: number = 1): Observable<Movie[]> {
+    const cache = this.popularMoviesCache();
+    if (cache.has(page)) {
+      return of(cache.get(page)!);
+    }
+
+    return this.http
+      .get<MovieResponse>(`${this.apiUrl}/movie/popular`, {
+        params: {
+          api_key: this.apiKey,
+          page: page.toString(),
+        },
+      })
+      .pipe(
+        tap((resp) => {
+          const newCache = new Map(cache);
+          newCache.set(page, resp.results);
+          this.popularMoviesCache.set(newCache);
+        }),
+        map((resp) => resp.results),
+      );
+  }
+
+  getTopRatedMovies(page: number = 1): Observable<Movie[]> {
+    const cache = this.topRatedMoviesCache();
+    if (cache.has(page)) {
+      return of(cache.get(page)!);
+    }
+
+    return this.http
+      .get<MovieResponse>(`${this.apiUrl}/movie/top_rated`, {
+        params: {
+          api_key: this.apiKey,
+          page: page.toString(),
+        },
+      })
+      .pipe(
+        tap((resp) => {
+          const newCache = new Map(cache);
+          newCache.set(page, resp.results);
+          this.topRatedMoviesCache.set(newCache);
+        }),
+        map((resp) => resp.results),
+      );
+  }
+
+  getTrendingMovies(timeWindow: 'day' | 'week', page: number = 1): Observable<Movie[]> {
+    const cache = timeWindow === 'day' ? this.trendingDayCache() : this.trendingWeekCache();
+    if (cache.has(page)) {
+      return of(cache.get(page)!);
+    }
+
+    return this.http
+      .get<MovieResponse>(`${this.apiUrl}/trending/movie/${timeWindow}`, {
+        params: {
+          api_key: this.apiKey,
+          page: page.toString(),
+        },
+      })
+      .pipe(
+        tap((resp) => {
+          const newCache = new Map(cache);
+          newCache.set(page, resp.results);
+
+          if (timeWindow === 'day') {
+            this.trendingDayCache.set(newCache);
+          } else {
+            this.trendingWeekCache.set(newCache);
+          }
+        }),
+        map((resp) => resp.results),
+      );
+  }
+
+  getTrendingDay(page: number = 1): Observable<Movie[]> {
+    return this.getTrendingMovies('day', page);
+  }
+
+  getTrendingWeek(page: number = 1): Observable<Movie[]> {
+    return this.getTrendingMovies('week', page);
   }
 
   loadNextSearchPage(): Observable<Movie[]> {
