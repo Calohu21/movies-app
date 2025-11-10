@@ -1,20 +1,16 @@
 import { Routes } from '@angular/router';
-import { MovieListPage } from './movies/pages/movie-list-page/movie-list-page';
-import { MovieCardPage } from './movies/pages/movie-card-page/movie-card-page';
+import { MovieHomePage } from './movies/pages/movie-home-page/movie-home-page';
+import { MovieGridPage } from './movies/pages/movie-grid-page/movie-grid-page';
 import { MovieDetailPage } from './movies/pages/movie-detail.page/movie-detail.page';
 
 export const routes: Routes = [
   {
     path: '',
-    component: MovieCardPage,
+    component: MovieHomePage,
   },
   {
-    path: 'movie-list-card',
-    component: MovieCardPage,
-  },
-  {
-    path: 'movie-list',
-    component: MovieListPage,
+    path: 'movies',
+    component: MovieGridPage,
   },
   {
     path: 'movie-detail/:id',
@@ -22,6 +18,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'movie-list-card',
+    redirectTo: '',
   },
 ];

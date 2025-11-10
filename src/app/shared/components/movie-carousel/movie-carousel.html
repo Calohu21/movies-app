@@ -1,0 +1,54 @@
+<section class="mb-8">
+  <!-- Header del carrusel -->
+  <div class="flex justify-between items-center mb-4 px-4">
+    <h2 class="text-2xl font-bold">{{ config().title }}</h2>
+    <button
+      class="btn btn-sm btn-outline"
+      (click)="handleViewMore()"
+    >
+      Ver más →
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex gap-4 px-4 overflow-x-hidden">
+      @for (skeleton of [1,2,3,4,5,6]; track skeleton) {
+        <div class="skeleton h-64 w-44 shrink-0"></div>
+      }
+    </div>
+  }
+
+  @if (movies().length > 0) {
+    <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-transparent">
+      <div class="flex gap-4 px-4 pb-4">
+        @for (movie of movies(); track movie.id) {
+          <div
+            class="flex-none cursor-pointer"
+            (click)="navigateToDetail(movie.id)"
+          >
+            <div class="card w-44 bg-base-100 shadow-md hover:shadow-xl transition-shadow">
+              <figure>
+                <img
+                  [src]="movie.poster_path | tmdbImage"
+                  [alt]="movie.title"
+                  class="h-64 w-44 object-cover rounded-t-lg"
+                />
+              </figure>
+              <div class="card-body p-2">
+                <h3 class="card-title text-sm line-clamp-2">{{ movie.title }}</h3>
+                <div class="flex items-center gap-1">
+                  <span class="text-warning text-lg">★</span>
+                  <span class="text-sm">{{ movie.vote_average.toFixed(1) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="text-center py-8 text-base-content/50">
+      <p>No hay películas disponibles</p>
+    </div>
+  }
+</section>
