@@ -20,6 +20,7 @@ export class MovieCarousel {
   handleViewMore(): void {
     const conf = this.config();
     this.viewMore.emit(conf);
+    this.navigateToGrid(conf);
   }
 
   private navigateToGrid(config: CarouselConfig): void {
@@ -38,14 +39,14 @@ export class MovieCarousel {
         break;
       case 'trending_week':
         queryParams.filter = 'trending';
-        queryParams.window = 'day';
+        queryParams.window = 'week';
         break;
       case 'genre':
-        queryParams.genres = config.genreId;
+        queryParams.genre = config.genreId;
         break;
     }
 
-    this.router.navigate(['/movies', { queryParams }]);
+    this.router.navigate(['/movies'], { queryParams });
   }
 
   navigateToDetail(movieId: number): void {
