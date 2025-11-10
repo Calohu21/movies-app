@@ -2,17 +2,17 @@
   appInfiniteScroll
   [hasMorePages]="hasMorePages()"
   (loadMore)="loadMore.emit()"
-  class="flex flex-wrap gap-4 p-4 justify-center"
+  class="flex flex-wrap gap-x-6 gap-y-8 p-6 justify-center"
 >
 @for (movie of movies(); track movie.id) {
   <div
-    class="cursor-pointer transition-transform duration-300 hover:-translate-y-2"
+    class="cursor-pointer transition-transform duration-300 hover:-translate-y-3 hover:scale-105"
     routerLink="/movie-detail/{{movie.id}}"
   >
     <img
       [src]="movie.poster_path | tmdbImage"
       [alt]="movie.title"
-      class="rounded-lg w-44 h-64 object-cover shadow-lg hover:shadow-2xl transition-shadow duration-300"
+      class="rounded-xl w-56 h-80 object-cover shadow-xl hover:shadow-2xl transition-all duration-300"
     />
   </div>
 }

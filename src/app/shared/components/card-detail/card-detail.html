@@ -24,88 +24,153 @@
 }
 
 @if (movie(); as movieData) {
-  <div class="card lg:card-side bg-base-100 shadow-xl mt-32 ml-10 mr-10">
-    <figure class="lg:w-3/12">
-      <img
-        [src]="movieData.poster_path | tmdbImage: 'w500'"
-        [alt]="movieData.title"
-        class="w-full h-full object-cover"
-      />
-    </figure>
-    <div class="card-body lg:w-2/3">
-      <h2 class="card-title text-3xl">{{ movieData.title }}</h2>
-
-      @if (movieData.tagline) {
-        <p class="italic text-gray-500">{{ movieData.tagline }}</p>
-      }
-
-      <div class="flex gap-2 flex-wrap my-2">
-        @for (genre of movieData.genres; track genre.id) {
-          <span class="badge badge-primary">{{ genre.name }}</span>
-        }
+  <div class="relative h-screen pt-20 bg-base-200 overflow-hidden">
+    @if (movieData.backdrop_path) {
+      <div class="absolute inset-0 overflow-hidden">
+        <img
+          [src]="movieData.backdrop_path | tmdbImage: 'original'"
+          [alt]="movieData.title"
+          class="w-full h-full object-cover opacity-20 blur-sm"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-base-200/80 via-base-200/90 to-base-200"></div>
       </div>
+    }
+    <div class="relative h-full flex items-center">
+      <div class="container mx-auto px-6">
+        <div class="grid grid-cols-12 gap-6 h-full items-stretch">
+          <div class="col-span-12 lg:col-span-4 flex items-center">
+            <img
+              [src]="movieData.poster_path | tmdbImage: 'w500'"
+              [alt]="movieData.title"
+              class="w-full h-full max-h-[85vh] object-cover rounded-2xl shadow-2xl"
+            />
+          </div>
+          <div class="col-span-12 lg:col-span-8 space-y-4 flex flex-col justify-center">
+            <div>
+              <h1 class="text-3xl lg:text-4xl font-bold mb-2">{{ movieData.title }}</h1>
+              @if (movieData.original_title !== movieData.title) {
+                <p class="text-base text-base-content/70 mb-1">{{ movieData.original_title }}</p>
+              }
+              @if (movieData.tagline) {
+                <p class="text-sm italic text-base-content/60">"{{ movieData.tagline }}"</p>
+              }
+            </div>
+            <div class="flex gap-2 flex-wrap">
 
-      <div class="grid grid-cols-2 gap-4 my-4">
-        <div>
-          <span class="font-bold">Fecha de estreno:</span>
-          <span class="ml-2">{{ movieData.release_date }}</span>
-        </div>
-        <div>
-          <span class="font-bold">Duración:</span>
-          <span class="ml-2">{{ movieData.runtime }} min</span>
-        </div>
-        <div>
-          <span class="font-bold">Calificación:</span>
-          <span class="ml-2">⭐ {{ movieData.vote_average }}/10</span>
-        </div>
-        <div>
-          <span class="font-bold">Votos:</span>
-          <span class="ml-2">{{ movieData.vote_count }}</span>
-        </div>
-      </div>
+              @for (genre of movieData.genres; track genre.id) {
+                <span class="badge badge-primary badge-lg">{{ genre.name }}</span>
+              }
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+              <div class="bg-base-100 p-4 rounded-xl shadow-lg">
+                <div class="text-sm text-base-content/60 mb-1">Rating</div>
+                <div class="text-xl font-bold flex items-center gap-1">
+                  <span class="text-yellow-500">⭐</span>
+                  {{ movieData.vote_average.toFixed(1) }}
+                </div>
+              </div>
 
-      <div class="my-4">
-        <h3 class="font-bold text-xl mb-2">Sinopsis</h3>
-        <p>{{ movieData.overview }}</p>
-      </div>
+              <div class="bg-base-100 p-4 rounded-xl shadow-lg">
+                <div class="text-sm text-base-content/60 mb-1">Duración</div>
+                <div class="text-xl font-bold">{{ movieData.runtime }}'</div>
+              </div>
 
-      @if (movieData.production_companies.length > 0) {
-        <div class="my-4">
-          <h3 class="font-bold text-xl mb-2">Productoras</h3>
-          <div class="flex gap-4 flex-wrap">
-            @for (company of movieData.production_companies; track company.id) {
-              <span class="badge badge-outline">{{ company.name }}</span>
-            }
+              <div class="bg-base-100 p-4 rounded-xl shadow-lg">
+                <div class="text-sm text-base-content/60 mb-1">Año</div>
+                <div class="text-xl font-bold">{{ movieData.release_date.toString().slice(0, 4) }}</div>
+              </div>
+
+              <div class="bg-base-100 p-4 rounded-xl shadow-lg">
+                <div class="text-sm text-base-content/60 mb-1">Idioma</div>
+                <div class="text-xl font-bold uppercase">{{ movieData.original_language }}</div>
+              </div>
+            </div>
+            <div class="bg-base-100/80 p-5 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+              <p class="text-base leading-relaxed">{{ movieData.overview }}</p>
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+              @if (movieData.production_companies.length > 0) {
+                <div class="bg-base-100/80 p-4 rounded-xl shadow-lg">
+                  <h3 class="text-base font-bold mb-2">Productoras</h3>
+                  <div class="text-sm space-y-1">
+                    @for (company of movieData.production_companies.slice(0, 3); track company.id) {
+                      <div>{{ company.name }}</div>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (movieData.budget > 0 || movieData.revenue > 0) {
+                <div class="bg-base-100/80 p-4 rounded-xl shadow-lg">
+                  <h3 class="text-base font-bold mb-2">Finanzas</h3>
+                  <div class="text-sm space-y-1">
+                    @if (movieData.budget > 0) {
+                      <div>
+                        <span class="text-base-content/60">Presupuesto:</span>
+                        <span class="font-bold"> ${{ (movieData.budget / 1000000).toFixed(0) }}M</span>
+                      </div>
+                    }
+                    @if (movieData.revenue > 0) {
+                      <div>
+                        <span class="text-base-content/60">Recaudación:</span>
+                        <span class="font-bold text-success"> ${{ (movieData.revenue / 1000000).toFixed(0) }}M</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              <div class="bg-base-100/80 p-4 rounded-xl shadow-lg">
+                <h3 class="text-base font-bold mb-2">Info Adicional</h3>
+                <div class="space-y-1 text-sm">
+                  <div>
+                    <div class="text-xs text-base-content/60">Estreno</div>
+                    <div class="font-semibold">{{ movieData.release_date }}</div>
+                  </div>
+                  <div>
+                    <div class="text-xs text-base-content/60">Estado</div>
+                    <div class="font-semibold">{{ movieData.status }}</div>
+                  </div>
+                  <div>
+                    <div class="text-xs text-base-content/60">Votos</div>
+                    <div class="font-semibold">{{ movieData.vote_count.toLocaleString() }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3">
+                @if (movieData.homepage) {
+                  <a
+                    [href]="movieData.homepage"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-primary btn-md gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                    Sitio Oficial
+                  </a>
+                }
+                @if (movieData.imdb_id) {
+                  <a
+                    [href]="'https://www.imdb.com/title/' + movieData.imdb_id"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-secondary btn-md gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                    Ver en IMDb
+                  </a>
+                }
+              </div>
+            </div>
           </div>
         </div>
-      }
-
-      <div class="card-actions justify-end mt-4">
-        @if (movieData.homepage) {
-          <a
-            [href]="movieData.homepage"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-primary"
-          >
-            Sitio oficial
-          </a>
-        }
-        @if (movieData.imdb_id) {
-          <a
-            [href]="'https://www.imdb.com/title/' + movieData.imdb_id"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-secondary"
-          >
-            Ver en IMDB
-          </a>
-        }
       </div>
     </div>
   </div>
 } @else {
-  <!-- Estado sin película -->
   <div class="alert alert-warning mt-32 ml-10 mr-10 w-200 justify-items-center">
     <svg
       xmlns="http://www.w3.org/2000/svg"
