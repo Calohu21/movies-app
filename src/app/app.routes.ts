@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { MovieListPage } from './movies/pages/movie-list-page/movie-list-page';
+import { MovieHomePage } from './movies/pages/movie-home-page/movie-home-page';
 import { MovieCardPage } from './movies/pages/movie-card-page/movie-card-page';
 import { MovieDetailPage } from './movies/pages/movie-detail.page/movie-detail.page';
 
@@ -13,8 +13,8 @@ export const routes: Routes = [
     component: MovieCardPage,
   },
   {
-    path: 'movie-list',
-    component: MovieListPage,
+    path: 'movie-home',
+    component: MovieHomePage,
   },
   {
     path: 'movie-detail/:id',
