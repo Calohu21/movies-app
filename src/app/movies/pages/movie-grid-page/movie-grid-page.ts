@@ -17,7 +17,31 @@ export class MovieGridPage implements OnInit {
   window = signal<string | null>(null);
   genreId = signal<number | null>(null);
 
-  movies = this.movieService.displayMovies;
+  movies = computed(() => {
+    const filterType = this.filter();
+
+    if (this.isSearchActive()) {
+      return this.movieService.displayMovies();
+    }
+
+    if (filterType === 'popular') {
+      return this.movieService.allPopularMovies();
+    }
+
+    if (filterType === 'top_rated') {
+      return this.movieService.allTopRatedMovies();
+    }
+
+    if (filterType === 'trending') {
+      const windowType = this.window();
+      return windowType === 'day'
+        ? this.movieService.allTrendingDayMovies()
+        : this.movieService.allTrendingWeekMovies();
+    }
+
+    return this.movieService.displayMovies();
+  });
+
   hasMorePages = this.movieService.hasMorePages;
   isSearchActive = this.movieService.isSearchActive;
 
@@ -95,8 +119,15 @@ export class MovieGridPage implements OnInit {
     }
 
     if (filterType === 'popular') {
+      this.movieService.loadNextPopularPage().subscribe();
     } else if (filterType === 'top_rated') {
+      this.movieService.loadNextTopRatedPage().subscribe();
     } else if (filterType === 'trending') {
+      if (windowType === 'day') {
+        this.movieService.loadNextTrendingDayPage().subscribe();
+      } else {
+        this.movieService.loadNextTrendingWeekPage().subscribe();
+      }
     } else {
       this.movieService.loadNextPage().subscribe();
     }
