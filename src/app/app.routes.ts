@@ -6,15 +6,11 @@ import { MovieDetailPage } from './movies/pages/movie-detail.page/movie-detail.p
 export const routes: Routes = [
   {
     path: '',
-    component: MovieGridPage,
-  },
-  {
-    path: 'movie-grid-card',
-    component: MovieGridPage,
-  },
-  {
-    path: 'movie-home',
     component: MovieHomePage,
+  },
+  {
+    path: 'movies',
+    component: MovieGridPage,
   },
   {
     path: 'movie-detail/:id',
@@ -22,6 +18,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'movie-list-card',
+    redirectTo: '',
   },
 ];
